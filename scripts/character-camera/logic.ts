@@ -34,7 +34,7 @@ export function ChangeFOV()
 {
     const assembly = Il2Cpp.domain.assembly("Assembly-CSharp").image
 
-    assembly.class("Sekai.Core.SekaiCameraAspect").method("CalculateVerticalFov").implementation = function(currentFov: number)
+    assembly.class("Sekai.Core.SekaiCameraAspect").method("CalculateVerticalFov").implementation = function()
     {
         return 70 // オーバーライドするFOVの値(100を超えたあたりからキャラクターのアウトラインがめっちゃ太くなるので注意)
     }

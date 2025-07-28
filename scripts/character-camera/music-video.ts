@@ -52,13 +52,4 @@ Il2Cpp.perform(() => {
         mvData.field<Il2Cpp.Object>("cameraInfo").value.field<boolean>("hasCameraDecoration").value = false
         this.method("Setup").invoke(isCreateNode, mvData)
     }
-
-    // CharacterModelのMeshOffStateの切り替えを無効化
-    assembly.class("Sekai.Core.CharacterModel").method("UpdateMeshViewTimeline").implementation = function(){}
-
-    const SekaiPostProcessPass = Il2Cpp.domain.assembly("Unity.RenderPipelines.Universal.Runtime").image.class("Sekai.Rendering.PostPrcessV2.SekaiPostProcessPass")
-    // SekaiDofを無効化
-    SekaiPostProcessPass.method("UpdateSekaiDof").implementation = function(){}
-    // フェードを無効化
-    SekaiPostProcessPass.method("UpdateFadeOutBeforeProp").implementation = function(){}
 })
