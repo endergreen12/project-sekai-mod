@@ -32,9 +32,7 @@ export function AttachCameraToCharacterModel(camera: Il2Cpp.Object, characterMod
 
 export function ChangeFOV()
 {
-    const assembly = Il2Cpp.domain.assembly("Assembly-CSharp").image
-
-    assembly.class("Sekai.Core.SekaiCameraAspect").method("CalculateVerticalFov").implementation = function()
+    Il2Cpp.domain.assembly("Assembly-CSharp").image.class("Sekai.Core.SekaiCameraAspect").method("CalculateVerticalFov").implementation = function()
     {
         return 70 // オーバーライドするFOVの値(100を超えたあたりからキャラクターのアウトラインがめっちゃ太くなるので注意)
     }
