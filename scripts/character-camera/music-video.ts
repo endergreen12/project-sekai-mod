@@ -6,7 +6,7 @@ Il2Cpp.perform(() => {
 
     const assembly = Il2Cpp.domain.assembly("Assembly-CSharp").image
 
-    // SubCameraトラック以外をカメラタイムラインから除去する
+    // MainCameraトラックをカメラタイムラインから除去する
     assembly.class("Sekai.Core.MVDataLoader").method<Il2Cpp.Object>("LoadTimelineAsset").implementation = function(timelineName: Il2Cpp.String, mvId: number)
     {
         const loadedTimelineAsset = this.method<Il2Cpp.Object>("LoadTimelineAsset").invoke(timelineName, mvId)
@@ -20,7 +20,8 @@ Il2Cpp.perform(() => {
             // trackObjectsを操作していくが、もし配列の最初からにすると要素を消していくうちに長さが変わってしまうので配列の最後からやる
             for(let i = trackObjectsArrayConverted.length - 1; i > -1 ; i--)
             {
-                if(!trackObjectsArrayConverted.get(i).isNull() && trackObjectsArrayConverted.get(i).method<Il2Cpp.String>("get_name").invoke().toString() !== '"SubCamera"')
+                const trackObj = trackObjectsArrayConverted.get(i)
+                if(!trackObj.isNull() && trackObj.method<Il2Cpp.String>("get_name").invoke().toString() === '"MainCamera"')
                 {
                     trackObjects.method("RemoveAt").invoke(i)
                 }
@@ -53,8 +54,11 @@ Il2Cpp.perform(() => {
     }
 
     // CharacterModelのMeshOffStateの切り替えを無効化
-    assembly.class("Sekai.Core.CharacterModel").method("UpdateMeshViewTimeline").implementation = function(meshOffState: Il2Cpp.ValueType)
-    {
-        
-    }
+    assembly.class("Sekai.Core.CharacterModel").method("UpdateMeshViewTimeline").implementation = function(){}
+
+    const SekaiPostProcessPass = Il2Cpp.domain.assembly("Unity.RenderPipelines.Universal.Runtime").image.class("Sekai.Rendering.PostPrcessV2.SekaiPostProcessPass")
+    // SekaiDofを無効化
+    SekaiPostProcessPass.method("UpdateSekaiDof").implementation = function(){}
+    // フェードを無効化
+    SekaiPostProcessPass.method("UpdateFadeOutBeforeProp").implementation = function(){}
 })

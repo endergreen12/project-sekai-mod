@@ -25,6 +25,7 @@ export function AttachCameraToCharacterModel(camera: Il2Cpp.Object, characterMod
         return
     }
 
+    camera.method("set_nearClipPlane").invoke(0.01)
     characterModel.method<Il2Cpp.Object>("get_Face").invoke().method("SetActive").invoke(false)
     characterModel.method<Il2Cpp.Object>("get_Hair").invoke().method("SetActive").invoke(false)
 }
