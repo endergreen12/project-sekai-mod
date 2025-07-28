@@ -10,25 +10,42 @@ Il2Cpp.perform(() => {
     {
         const loadedTimelineAsset = this.method<Il2Cpp.Object>("LoadTimelineAsset").invoke(timelineName, mvId)
         const trackObjects = loadedTimelineAsset.method<Il2Cpp.Object>("get_trackObjects").invoke()
-        const trackObjectsArrayConverted = trackObjects.method<Il2Cpp.Array<Il2Cpp.Object>>("ToArray").invoke()
+        const trackObjectsArray = trackObjects.method<Il2Cpp.Array<Il2Cpp.Object>>("ToArray").invoke()
 
         switch(timelineName.toString())
         {
-            case '"Camera"': // MainCameraトラックをカメラタイムラインから除去する
-                for(let i = trackObjectsArrayConverted.length - 1; i > -1; i--)
+            case '"Camera"': // MainCameraのアニメーションとDoFトラックを削除
+                for(let i = trackObjectsArray.length - 1; i > -1; i--)
                 {
-                    const trackObj = trackObjectsArrayConverted.get(i)
-                    if(!trackObj.isNull() && trackObj.method<Il2Cpp.String>("get_name").invoke().toString() === '"MainCamera"')
+                    const trackObj = trackObjectsArray.get(i)
+
+                    if(!trackObj.isNull())
                     {
-                        trackObjects.method("RemoveAt").invoke(i)
+                        const name = trackObj.method<Il2Cpp.String>("get_name").invoke().toString()
+
+                        if(name === '"MainCamera"' || name.toLocaleLowerCase().includes("dof"))
+                        {
+                            trackObjects.method("RemoveAt").invoke(i)
+                        } else if(name.toLocaleLowerCase().includes("effect")) // Effect GroupからDoFトラックを除去、小文字にしてincludesで判定しているのはMVによって大文字だったり小文字だったりするため
+                        {
+                            const children = trackObj.field<Il2Cpp.Object>("m_Children").value
+                            const childrenArray = children.method<Il2Cpp.Array<Il2Cpp.Object>>("ToArray").invoke()
+                            for(let j = childrenArray.length - 1; j > -1; j--)
+                            {
+                                if(childrenArray.get(j).method<Il2Cpp.String>("get_name").invoke().toString().toLocaleLowerCase().includes("dof"))
+                                {
+                                    children.method("RemoveAt").invoke(j)
+                                }
+                            }
+                        }
                     }
                 }
                 break
 
             case '"Character"': // MeshOffトラックを除去
-                for(let i = trackObjectsArrayConverted.length - 1; i > -1; i--)
+                for(let i = trackObjectsArray.length - 1; i > -1; i--)
                 {
-                    const trackObj = trackObjectsArrayConverted.get(i)
+                    const trackObj = trackObjectsArray.get(i)
                     if(!trackObj.isNull() && trackObj.method<Il2Cpp.String>("get_name").invoke().toString().includes("MeshOff"))
                     {
                         trackObjects.method("RemoveAt").invoke(i)
