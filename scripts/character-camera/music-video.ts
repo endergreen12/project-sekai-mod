@@ -6,26 +6,35 @@ Il2Cpp.perform(() => {
 
     const assembly = Il2Cpp.domain.assembly("Assembly-CSharp").image
 
-    // MainCameraトラックをカメラタイムラインから除去する
     assembly.class("Sekai.Core.MVDataLoader").method<Il2Cpp.Object>("LoadTimelineAsset").implementation = function(timelineName: Il2Cpp.String, mvId: number)
     {
         const loadedTimelineAsset = this.method<Il2Cpp.Object>("LoadTimelineAsset").invoke(timelineName, mvId)
-        
-        if(timelineName.toString() === '"Camera"')
+        const trackObjects = loadedTimelineAsset.method<Il2Cpp.Object>("get_trackObjects").invoke()
+        const trackObjectsArrayConverted = trackObjects.method<Il2Cpp.Array<Il2Cpp.Object>>("ToArray").invoke()
+
+        switch(timelineName.toString())
         {
-            const trackObjects = loadedTimelineAsset.method<Il2Cpp.Object>("get_trackObjects").invoke()
-            // trackObjectsはList型で、frida-il2cpp-bridgeにおいてListから要素を取得するのはくそめんどくさいので配列型に変換したものを参考にしながらtrackObjectsを操作する
-            const trackObjectsArrayConverted = trackObjects.method<Il2Cpp.Array<Il2Cpp.Object>>("ToArray").invoke()
-            
-            // trackObjectsを操作していくが、もし配列の最初からにすると要素を消していくうちに長さが変わってしまうので配列の最後からやる
-            for(let i = trackObjectsArrayConverted.length - 1; i > -1 ; i--)
-            {
-                const trackObj = trackObjectsArrayConverted.get(i)
-                if(!trackObj.isNull() && trackObj.method<Il2Cpp.String>("get_name").invoke().toString() === '"MainCamera"')
+            case '"Camera"': // MainCameraトラックをカメラタイムラインから除去する
+                for(let i = trackObjectsArrayConverted.length - 1; i > -1; i--)
                 {
-                    trackObjects.method("RemoveAt").invoke(i)
+                    const trackObj = trackObjectsArrayConverted.get(i)
+                    if(!trackObj.isNull() && trackObj.method<Il2Cpp.String>("get_name").invoke().toString() === '"MainCamera"')
+                    {
+                        trackObjects.method("RemoveAt").invoke(i)
+                    }
                 }
-            }
+                break
+
+            case '"Character"': // MeshOffトラックを除去
+                for(let i = trackObjectsArrayConverted.length - 1; i > -1; i--)
+                {
+                    const trackObj = trackObjectsArrayConverted.get(i)
+                    if(!trackObj.isNull() && trackObj.method<Il2Cpp.String>("get_name").invoke().toString().includes("MeshOff"))
+                    {
+                        trackObjects.method("RemoveAt").invoke(i)
+                    }
+                }
+                break
         }
 
         return loadedTimelineAsset
