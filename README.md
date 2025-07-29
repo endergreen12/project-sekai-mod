@@ -15,8 +15,12 @@
 またいちいち英語で書いたりするのがめんどくさかったのでこのリポジトリでは全部日本語で書きます
 
 ## 機能
-### キャラクターカメラ
-MVで一人称視点と三人称視点にできます
+### キャラクターカメラ(scripts/character-camera)
+MV用:music-video.ts
+
+一人称視点と三人称視点にできます
+
+三人称視点にするにはscripts/character-camera/logic.tsにあるenableThirdPersonをtrueにしてください
 
 ---
 
